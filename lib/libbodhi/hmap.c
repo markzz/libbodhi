@@ -1,3 +1,21 @@
+/*
+ * hmap.c
+ *
+ * Copyright (c) 2018, Mark Weiman <mark.weiman@markzz.com>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -64,6 +82,36 @@ static int _bodhi_hmap_resize(bodhi_hmap_t *hmap) {
     hmap->vals = new_vals;
 
     return 0;
+}
+
+int bodhi_hmap_insert_no_cpy(bodhi_hmap_t *hmap, void *key, void *val) {
+    ASSERT(hmap != NULL, return -1);
+    ASSERT(key != NULL, return -1);
+
+    if (((double)(hmap->consumed_size) / (double)(hmap->alloc_size)) > 0.85) {
+        /* TODO: If this fails, continue, but log that a resize failed */
+        _bodhi_hmap_resize(hmap);
+    }
+
+    size_t index = hmap->hash_fn(key, hmap->alloc_size);
+    if (index < 0 || index > hmap->alloc_size - 1) {
+        return 0;
+    }
+
+    while (1) {
+        if (hmap->keys[index] == NULL || hmap->keys[index] == key) {
+            hmap->keys[index] = key;
+            break;
+        } else {
+            if (++index >= hmap->alloc_size) {
+                index = 0;
+            }
+        }
+    }
+    hmap->vals[index] = val;
+
+    hmap->consumed_size++;
+    return 1;
 }
 
 int bodhi_hmap_insert(bodhi_hmap_t *hmap, void *key, size_t key_size, void *val, size_t val_size) {
