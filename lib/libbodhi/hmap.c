@@ -21,6 +21,7 @@
 
 #include "hmap.h"
 #include "util.h"
+#include "list.h"
 
 struct _bodhi_hmap_t {
     bodhi_hash_fn hash_fn;
@@ -52,6 +53,26 @@ bodhi_hmap_t *bodhi_hmap_new_size(bodhi_hash_fn hash_fn, bodhi_hmap_cmp_fn cmp_f
 
 bodhi_hmap_t *bodhi_hmap_new(bodhi_hash_fn hash_fn, bodhi_hmap_cmp_fn cmp_fn, bodhi_hmap_free_fn key_free_fn) {
     return bodhi_hmap_new_size(hash_fn, cmp_fn, key_free_fn, 25);
+}
+
+void bodhi_hmap_free(bodhi_hmap_t *hmap, bodhi_hmap_free_fn val_free) {
+    ASSERT(hmap != NULL, return);
+    size_t cur;
+
+    for (cur = 0; cur < hmap->alloc_size; cur++) {
+        if (hmap->keys[cur] != NULL) {
+            hmap->free_fn(hmap->keys[cur]);
+        }
+
+        if (hmap->vals[cur] != NULL && val_free != NULL) {
+            val_free(hmap->vals[cur]);
+        }
+    }
+
+    free(hmap->vals);
+    free(hmap->keys);
+
+    free(hmap);
 }
 
 static int _bodhi_hmap_resize(bodhi_hmap_t *hmap) {
@@ -182,6 +203,31 @@ void *bodhi_hmap_delete(bodhi_hmap_t *hmap, void *key) {
     return ret;
 }
 
+int bodhi_hmap_key_exists(bodhi_hmap_t *hmap, void *key) {
+    ASSERT(hmap != NULL, return -1);
+
+    size_t count;
+
+    size_t index = _bodhi_hmap_find_index(hmap, key);
+    if (index == hmap->alloc_size) {
+        return -1;
+    }
+
+    for (count = 0; count < hmap->alloc_size; count++) {
+        if (index == hmap->alloc_size) {
+            index = 0;
+        }
+
+        if (hmap->cmp_fn(hmap->keys[index], key) != 0) {
+            index++;
+        } else {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 void *bodhi_hmap_value(bodhi_hmap_t *hmap, void *key) {
     ASSERT(hmap != NULL, return NULL);
     size_t index = _bodhi_hmap_find_index(hmap, key);
@@ -195,4 +241,23 @@ void *bodhi_hmap_value(bodhi_hmap_t *hmap, void *key) {
 size_t bodhi_hmap_size(bodhi_hmap_t *hmap) {
     ASSERT(hmap != NULL, return 0);
     return hmap->consumed_size;
+}
+
+bodhi_list_t *bodhi_hmap_get_keys(bodhi_hmap_t *hmap) {
+    ASSERT(hmap != NULL, return NULL);
+
+    bodhi_list_t *ret = NULL;
+    size_t cur;
+
+    for (cur = 0; cur < hmap->alloc_size; cur++) {
+        if (hmap->keys[cur] != NULL) {
+            if (ret == NULL) {
+                ret = bodhi_list_new(hmap->keys[cur]);
+            } else {
+                bodhi_list_add_sorted(ret, hmap->keys[cur], hmap->cmp_fn);
+            }
+        }
+    }
+
+    return ret;
 }
