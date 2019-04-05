@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 
-#include <bodhi/list.h>
+#include <libbodhi/list.h>
 
 typedef struct _bodhi_hmap_t bodhi_hmap_t;
 
