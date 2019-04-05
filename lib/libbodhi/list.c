@@ -393,6 +393,9 @@ bodhi_list_t *bodhi_list_nth(bodhi_list_t *list, size_t n) {
     size_t i;
 
     for (i = n; i > 0; i--) {
+        if (ret == NULL) {
+            return NULL;
+        }
         ret = ret->next;
     }
 
