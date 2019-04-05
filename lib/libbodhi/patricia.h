@@ -24,13 +24,17 @@
 typedef struct _bodhi_patricia_t bodhi_patricia_t;
 
 typedef void (trie_free_fn)(void*);
+typedef void (trie_loop_cb)(bodhi_patricia_t*, void*);
 
 void bodhi_patricia_free(bodhi_patricia_t *trie, trie_free_fn fn);
 bodhi_patricia_t *bodhi_patricia_new_blank();
 bodhi_patricia_t *bodhi_patricia_new(uint32_t init_key, void *data);
 int bodhi_patricia_add(bodhi_patricia_t **trie, uint32_t key, void *data);
 int bodhi_patricia_remove(bodhi_patricia_t **trie, uint32_t key, void **retval);
-void *bodhi_patricia_get_val(bodhi_patricia_t *trie, uint32_t key);
+void *bodhi_patricia_find_val(bodhi_patricia_t *trie, uint32_t key);
 size_t bodhi_patricia_size(bodhi_patricia_t *trie);
+void bodhi_patricia_loop(bodhi_patricia_t *trie, trie_loop_cb cb, void *udata);
+uint32_t bodhi_patricia_get_key(bodhi_patricia_t *node);
+int bodhi_patricia_get_pos(bodhi_patricia_t *node);
 
 #endif

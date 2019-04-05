@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include "patricia.h"
+#include "util.h"
 
 struct _bodhi_patricia_t {
     struct _bodhi_patricia_t *left;
@@ -213,7 +214,7 @@ void bodhi_patricia_free(bodhi_patricia_t *trie, trie_free_fn fn) {
     }
 }
 
-void *bodhi_patricia_get_val(bodhi_patricia_t *trie, uint32_t key) {
+void *bodhi_patricia_find_val(bodhi_patricia_t *trie, uint32_t key) {
     if (trie == NULL) {
         return NULL;
     }
@@ -222,9 +223,9 @@ void *bodhi_patricia_get_val(bodhi_patricia_t *trie, uint32_t key) {
         return trie->data;
     } else {
         if ((key & (1 << (31 - trie->pos))) == 0) {
-            return bodhi_patricia_get_val(trie->left, key);
+            return bodhi_patricia_find_val(trie->left, key);
         } else {
-            return bodhi_patricia_get_val(trie->right, key);
+            return bodhi_patricia_find_val(trie->right, key);
         }
     }
 }
@@ -235,4 +236,25 @@ size_t bodhi_patricia_size(bodhi_patricia_t *trie) {
     } else {
         return bodhi_patricia_size(trie->left) + bodhi_patricia_size(trie->right);
     }
+}
+
+void bodhi_patricia_loop(bodhi_patricia_t *trie, trie_loop_cb cb, void *udata) {
+    ASSERT(trie != NULL, return);
+
+    if (trie->isset) {
+        cb(trie, udata);
+    } else {
+        bodhi_patricia_loop(trie->left, cb, udata);
+        bodhi_patricia_loop(trie->right, cb, udata);
+    }
+}
+
+uint32_t bodhi_patricia_get_key(bodhi_patricia_t *node) {
+    ASSERT(node != NULL, return 0);
+    return node->key;
+}
+
+int bodhi_patricia_get_pos(bodhi_patricia_t *node) {
+    ASSERT(node != NULL, return 0);
+    return node->pos;
 }
