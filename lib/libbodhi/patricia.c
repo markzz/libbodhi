@@ -204,7 +204,9 @@ void bodhi_patricia_free(bodhi_patricia_t *trie, trie_free_fn fn) {
             bodhi_patricia_free(trie->right, fn);
             trie->right = NULL;
         } else {
-            fn(trie->data);
+            if (trie->data != NULL) {
+                fn(trie->data);
+            }
             free(trie);
             return;
         }
