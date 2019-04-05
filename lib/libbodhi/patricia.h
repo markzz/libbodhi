@@ -16,8 +16,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef PCAP_STATS_PATRICIA_H
-#define PCAP_STATS_PATRICIA_H
+#ifndef BODHI_PATRICIA_H
+#define BODHI_PATRICIA_H
 
 #include <inttypes.h>
 
@@ -33,4 +33,4 @@ int bodhi_patricia_remove(bodhi_patricia_t **trie, uint32_t key, void **retval);
 void *bodhi_patricia_get_val(bodhi_patricia_t *trie, uint32_t key);
 size_t bodhi_patricia_size(bodhi_patricia_t *trie);
 
-#endif //PCAP_STATS_bodhi_patricia_H
+#endif
