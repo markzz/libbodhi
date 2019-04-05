@@ -38,7 +38,8 @@ static bodhi_patricia_t *_alloc_bodhi_patricia() {
 }
 
 static unsigned int _shared_bits(uint32_t a, uint32_t b) {
-    for (int i = 0; i <= 32; i++) {
+    int i;
+    for (i = 0; i <= 32; i++) {
         if (a >> i == b >> i) {
             return 32 - i;
         }
