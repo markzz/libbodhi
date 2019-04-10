@@ -254,7 +254,7 @@ bodhi_list_t *bodhi_hmap_get_keys(bodhi_hmap_t *hmap) {
             if (ret == NULL) {
                 ret = bodhi_list_new(hmap->keys[cur]);
             } else {
-                bodhi_list_add_sorted(ret, hmap->keys[cur], hmap->cmp_fn);
+                ret = bodhi_list_add_sorted(ret, hmap->keys[cur], hmap->cmp_fn);
             }
         }
     }
