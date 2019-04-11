@@ -50,7 +50,7 @@ bodhi_list_t *bodhi_list_new(void *data) {
 
     ret->data = data;
     ret->next = NULL;
-    ret->prev = NULL;
+    ret->prev = ret;
 
     return ret;
 }
@@ -68,6 +68,7 @@ bodhi_list_t *bodhi_list_add(bodhi_list_t *list, void *data) {
         last = list->prev;
         last->next = new;
         new->prev = last;
+        list->prev = new;
         return list;
     } else {
         return new;
