@@ -374,17 +374,11 @@ bodhi_list_t *bodhi_list_reverse(bodhi_list_t *list) {
     tmp = list->prev;
     list->prev = NULL;
 
-    for (iter = list->prev; iter; iter = iter->prev) {
-        if ((ret = bodhi_list_new(iter->data)) == NULL) {
-            bodhi_list_free(ret);
-            return NULL;
-        } else {
-            if (bodhi_list_add(ret, iter->data) == NULL) {
-                bodhi_list_free(ret);
-                return NULL;
-            }
-        }
+    ret = bodhi_list_new(tmp->data);
+    while ((tmp = tmp->prev)) {
+        bodhi_list_add(ret, tmp->data);
     }
+
     list->prev = tmp;
     return ret;
 }
