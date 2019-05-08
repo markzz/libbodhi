@@ -234,13 +234,10 @@ bodhi_list_t *bodhi_list_remove_item(bodhi_list_t *list, bodhi_list_t *item) {
         if (list != NULL) {
             list->prev = item->prev;
         }
-        item->prev = NULL;
+        item->next = NULL;
     } else if (item == list->prev) {
-        if (item->prev != NULL) {
-            item->prev->next = item->next;
-            list->prev = item->prev;
-            item->prev = NULL;
-        }
+        item->prev->next = NULL;
+        list->prev = item->prev;
     } else {
         if (item->next != NULL) {
             item->next->prev = item->prev;
@@ -249,8 +246,10 @@ bodhi_list_t *bodhi_list_remove_item(bodhi_list_t *list, bodhi_list_t *item) {
         if (item->prev != NULL) {
             item->prev->next = item->next;
         }
+        item->next = NULL;
     }
 
+    item->prev = item;
     return list;
 }
 
