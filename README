@@ -1,0 +1,25 @@
+libbodhi
+========
+
+A data structures library that focuses on readability and portability.
+
+This library grants access to three data structures (possibly more to come, I
+don't know), linked lists, hash maps, and patricia tries.
+
+Installation
+============
+
+There are no dependencies other than a somewhat capable c standard library and
+cmake for building.
+
+Once you clone this repository, from the root of the repository, run the
+following:
+
+    $ mkdir build
+    $ cd build
+    $ cmake ..
+    $ make
+    # make install
+
+This will install this library with the prefix /usr/local so you may also need
+to run `ldconfig` as root to build other software with this.
