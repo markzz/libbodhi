@@ -102,11 +102,14 @@ static int _bodhi_hmap_resize(bodhi_hmap_t *hmap) {
     size_t new_size = hmap->alloc_size * 2;
     size_t iter;
 
-    bkts = realloc(hmap->buckets, sizeof(bodhi_hmap_bucket_t*) * new_size);
+    bkts = realloc(hmap->buckets, sizeof(bodhi_list_t*) * new_size);
     if (bkts == NULL) {
         return -1;
     }
-    memset(bkts + (hmap->alloc_size * sizeof(bodhi_hmap_bucket_t*)), 0, hmap->alloc_size);
+
+    for (iter = hmap->alloc_size; iter < new_size; iter++) {
+        bkts[iter] = NULL;
+    }
 
     for (iter = 0; iter < hmap->alloc_size; iter++) {
         bodhi_list_t *tmp = bkts[iter];
