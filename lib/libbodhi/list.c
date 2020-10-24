@@ -105,6 +105,7 @@ bodhi_list_t *bodhi_list_add_sorted(bodhi_list_t *list, void *data, bodhi_list_c
             new->next = NULL;
             prev->next = new;
             list->prev = new;
+            return list;
         } else {
             new->prev = prev;
             new->next = next;
